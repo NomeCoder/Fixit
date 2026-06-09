@@ -21,7 +21,7 @@ import numpy as np
 from email_sender import send_complaint_email
 
 
-model = tf.keras.models.load_model("../fixit_model.keras")
+model = tf.keras.models.load_model("fixit_model.keras")
 
 CLASS_NAMES = [
     "garbage",
