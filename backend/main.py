@@ -351,7 +351,7 @@ async def report_issue(
         complaint
     )
     if image_path and os.path.exists(image_path):
-    os.remove(image_path)
+        os.remove(image_path)
 
     complaint["_id"] = str(
         result.inserted_id
