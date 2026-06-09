@@ -315,7 +315,7 @@ async def report_issue(
 
     "location": location,
 
-    "image": f"http://localhost:8000/{image_path}" if image_path else None,
+    "image": f"https://fixit-msbc.onrender.com/{image_path}" if image_path else None,
 
     "authority": authority,
     "ai_prediction": predicted_issue,
