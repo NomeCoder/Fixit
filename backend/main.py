@@ -353,9 +353,9 @@ async def report_issue(
     {user_email}
     """
 
-    send_complaint_email(
-        receiver_email=receiver_email,
-        subject=subject,
-        body=body,
-        image_path=image_path
-    )   
+    #send_complaint_email(
+        #receiver_email=receiver_email,
+        #subject=subject,
+        #body=body,
+        #image_path=image_path
+    #)   
