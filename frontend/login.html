@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Login</title>
+
+<style>
+
+body{
+    margin:0;
+    background:black;
+    color:white;
+    font-family:Arial;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    height:100vh;
+}
+
+.card{
+
+    background:#111;
+
+    padding:40px;
+
+    border-radius:20px;
+
+    width:350px;
+
+    text-align:center;
+}
+
+.title{
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    margin-bottom:30px;
+}
+
+button{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:30px;
+
+    background:white;
+
+    color:black;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+button:hover{
+
+    background:#ddd;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="title">
+        FixIt
+    </div>
+
+    <button onclick="googleLogin()">
+
+        Continue with Google
+
+    </button>
+
+</div>
+
+<script type="module">
+
+import {
+ initializeApp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
+ getAuth,
+
+ GoogleAuthProvider,
+
+ signInWithPopup
+
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyBJ6VmtHQOnyWf-qzJR8fHKN92UgtKaaqg",
+
+  authDomain: "fixit-5e4a5.firebaseapp.com",
+
+  projectId: "fixit-5e4a5",
+
+  storageBucket: "fixit-5e4a5.firebasestorage.app",
+
+  messagingSenderId: "820903960572",
+
+  appId: "1:820903960572:web:49f5a510b65c50f4eadc79"
+
+};
+
+const app =
+    initializeApp(firebaseConfig);
+
+const auth =
+    getAuth(app);
+
+window.googleLogin = async function(){
+
+    const provider =
+        new GoogleAuthProvider();
+
+    try{
+
+        const result =
+            await signInWithPopup(
+                auth,
+                provider
+            );
+
+        const user =
+            result.user;
+
+        localStorage.setItem(
+
+            "user",
+
+            JSON.stringify({
+
+                name:user.displayName,
+
+                email:user.email,
+
+                photo:user.photoURL
+
+            })
+        );
+
+        window.location.href =
+            "index.html";
+    }
+
+    catch(err){
+
+        alert(err.message);
+    }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Report Problem</title>
+
+<style>
+
+body{
+    margin:0;
+    background:black;
+    color:white;
+    font-family:Arial;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:#111;
+    padding:25px;
+    border-radius:20px;
+    margin-top:40px;
+}
+
+.title{
+    font-size:28px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+input, textarea, select{
+    width:100%;
+    background:#1a1a1a;
+    border:none;
+    color:white;
+    padding:15px;
+    border-radius:12px;
+    margin-top:15px;
+    box-sizing:border-box;
+}
+
+button{
+    background:#1d9bf0;
+    color:white;
+    border:none;
+    padding:14px 22px;
+    border-radius:25px;
+    margin-top:20px;
+    font-size:16px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.back{
+    color:#1d9bf0;
+    text-decoration:none;
+}
+@media (max-width: 768px){
+
+    .container{
+        max-width:100%;
+        padding:10px;
+        box-sizing:border-box;
+    }
+
+    .card{
+        margin-top:20px;
+        padding:15px;
+        border-radius:15px;
+    }
+
+    .title{
+        font-size:20px;
+    }
+
+    input,
+    textarea,
+    select{
+        font-size:16px;
+        padding:12px;
+        width:100%;
+        box-sizing:border-box;
+    }
+
+    button{
+        width:100%;
+        padding:14px;
+        font-size:16px;
+    }
+
+    .new-btn{
+        padding:8px 12px;
+        font-size:14px;
+    }
+
+    #profilePhoto{
+        width:45px !important;
+        height:45px !important;
+    }
+
+    .post{
+        margin:10px;
+        padding:15px;
+    }
+
+    .post img{
+        max-width:100%;
+        height:auto;
+    }
+
+    .issue{
+        font-size:18px;
+    }
+
+    .actions{
+        flex-wrap:wrap;
+    }
+
+    .actions button{
+        flex:1;
+        min-width:100px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="index.html" class="back">
+        ← Back to Feed
+    </a>
+
+    <div class="card">
+
+        <div class="title">
+            Report Civic Problem
+        </div>
+
+        <input
+            id="issue"
+            placeholder="Issue Type"
+        >
+
+    <textarea
+        id="description"
+        rows="5"
+        placeholder="Describe the issue"
+    ></textarea>
+
+    <input
+        id="location"
+        placeholder="Location"
+    >
+
+    <select id="city">
+        <option value="gurgaon">Gurgaon</option>
+        <option value="delhi">Delhi</option>
+        <option value="mumbai">Mumbai</option>
+        <option value="chennai">Chennai</option>
+    </select>
+
+        <input
+            type="file"
+            id="image"
+        >   
+
+        <button onclick="submitComplaint()">
+            Submit Problem
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const API = "http://127.0.0.1:8000";
+
+async function submitComplaint(){
+
+    const formData = new FormData();
+
+const user =
+JSON.parse(localStorage.getItem("user"));
+
+    if(!user){
+
+        alert("Please login first");
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+    formData.append(
+        "issue_type",
+        document.getElementById("issue").value
+    );
+
+    formData.append(
+        "description",
+        document.getElementById("description").value
+    );
+
+    formData.append(
+        "location",
+        document.getElementById("location").value
+    );
+    formData.append(
+    "city",
+    document.getElementById("city").value
+    );
+
+    const image =
+        document.getElementById("image").files[0];
+
+    if(image){
+        formData.append("image", image);
+    }
+    formData.append(
+    "user_name",
+    user.name
+    );
+
+    formData.append(
+    "user_photo",
+    user.photo
+    );
+
+    formData.append(
+    "user_email",
+    user.email
+    );
+
+    await fetch(API + "/report", {
+        method:"POST",
+        body:formData
+    });
+
+    window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>

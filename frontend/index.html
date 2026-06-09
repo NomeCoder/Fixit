@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>FixIt</title>
+
+<style>
+
+body{
+    margin:0;
+    background:black;
+    color:white;
+    font-family:Arial;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    border-left:1px solid #222;
+    border-right:1px solid #222;
+    min-height:100vh;
+}
+
+.topbar{
+    position:sticky;
+    top:0;
+    background:black;
+    padding:15px 20px;
+    border-bottom:1px solid #222;
+
+    display:flex;
+    align-items:center;
+}
+
+.title{
+    font-size:24px;
+    font-weight:bold;
+}
+
+#profilePhoto{
+    margin-left:auto;
+}
+
+.new-btn{
+    margin-left:20px;
+
+    background:#1d9bf0;
+    color:white;
+    padding:10px 18px;
+    border-radius:20px;
+    text-decoration:none;
+    font-weight:bold;
+}
+.title{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.new-btn{
+    background:#1d9bf0;
+    color:white;
+    padding:10px 18px;
+    border-radius:20px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.post{
+    padding:20px;
+    border-bottom:1px solid #222;
+}
+
+.post img{
+    width:100%;
+    border-radius:15px;
+    margin-top:15px;
+}
+
+.issue{
+    font-size:22px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.location{
+    color:gray;
+    margin-top:5px;
+}
+
+.authority{
+    color:#1d9bf0;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+.actions{
+    margin-top:15px;
+    display:flex;
+    gap:15px;
+}
+
+.actions button{
+    background:#111;
+    border:1px solid #333;
+    color:white;
+    padding:10px 16px;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+.actions button:hover{
+    background:#1d9bf0;
+}
+.topbar{
+    position:sticky;
+    top:0;
+    background:rgba(0,0,0,.9);
+    backdrop-filter:blur(10px);
+    padding:15px 20px;
+    border-bottom:1px solid #222;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.new-btn{
+    transition:.3s;
+}
+
+.new-btn:hover{
+    transform:translateY(-2px);
+}
+
+.post{
+    background:#0f0f0f;
+    margin:15px;
+    border-radius:20px;
+    padding:20px;
+    transition:.3s;
+}
+
+.post:hover{
+    transform:translateY(-4px);
+}
+@media (max-width: 768px){
+
+    .container{
+        max-width:100%;
+        padding:10px;
+        box-sizing:border-box;
+    }
+
+    .card{
+        margin-top:20px;
+        padding:15px;
+        border-radius:15px;
+    }
+
+    .title{
+        font-size:20px;
+    }
+
+    input,
+    textarea,
+    select{
+        font-size:16px;
+        padding:12px;
+        width:100%;
+        box-sizing:border-box;
+    }
+
+    button{
+        width:100%;
+        padding:14px;
+        font-size:16px;
+    }
+
+    .new-btn{
+        padding:8px 12px;
+        font-size:14px;
+    }
+
+    #profilePhoto{
+        width:45px !important;
+        height:45px !important;
+    }
+
+    .post{
+        margin:10px;
+        padding:15px;
+    }
+
+    .post img{
+        max-width:100%;
+        height:auto;
+    }
+
+    .issue{
+        font-size:18px;
+    }
+
+    .actions{
+        flex-wrap:wrap;
+    }
+
+    .actions button{
+        flex:1;
+        min-width:100px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="topbar">
+
+    <div class="title">
+        FixIt
+    </div>
+
+    <img
+        id="profilePhoto"
+        src=""
+        onclick="openProfile()"
+        style="
+            width:55px;
+            height:55px;
+            border-radius:50%;
+            cursor:pointer;
+            object-fit:cover;
+            border:2px solid #1d9bf0;
+        "
+    >
+
+    <a href="create.html" class="new-btn">
+        + New Problem
+    </a>
+
+</div>
+
+
+
+    <div id="feed"></div>
+
+</div>
+
+<script>
+
+const API = "http://127.0.0.1:8000";
+const user =
+JSON.parse(
+    localStorage.getItem("user")
+);
+
+if(user){
+
+    document.getElementById(
+        "profilePhoto"
+    ).src = user.photo;
+}
+function openProfile(){
+
+    localStorage.removeItem(
+        "viewProfile"
+    );
+
+    window.location.href =
+        "profile.html";
+}
+
+async function loadComplaints(){
+    
+
+    const response =
+        await fetch(API + "/complaints");
+
+    const complaints =
+        await response.json();
+
+    const feed =
+        document.getElementById("feed");
+
+    feed.innerHTML = "";
+
+    complaints.reverse().forEach(c => {
+
+        feed.innerHTML += `
+
+        <div class="post">
+           <div style="
+            display:flex;
+            align-items:center;
+            gap:12px;
+            cursor:pointer;
+        "
+        onclick="openUserProfile(
+        '${c.user_name}',
+        '${c.user_email}',
+        '${c.user_photo}'
+        )">
+
+<img
+    src="${c.user_photo}"
+
+    referrerpolicy="no-referrer"
+
+    style="
+        width:50px;
+        height:50px;
+        border-radius:50%;
+        object-fit:cover;
+    "
+>
+
+    <div>
+
+        <div style="
+        font-weight:bold;
+        font-size:18px;
+        ">
+           ${c.user_name}
+        </div>
+
+        <div style="
+        color:gray;
+        ">
+            &#128205; ${c.location}
+        </div>
+
+    </div>
+
+</div>
+
+            <div class="issue">
+                ${c.issue_type}
+            </div>
+
+            <div class="location">
+                📍 ${c.location}
+            </div>
+
+            <div style="margin-top:15px;">
+                ${c.description}
+            </div>
+
+            ${
+                c.image
+                ?
+                `<img src="${c.image}">`
+                :
+                ""
+            }
+
+            <div class="authority">
+                Routed To:
+                ${c.authority}
+            </div>
+
+<div class="actions">
+
+    <button onclick="upvote('${c.id}', this)">
+        ⬆️ <span>${c.likes || 0}</span>
+    </button>
+
+    <button onclick="toggleComments('${c.id}')">
+        💬 Comment
+    </button>
+
+    <button onclick="escalate(this)">
+        🚨 Escalate
+    </button>
+
+</div>
+
+<div
+    id="comments-${c.id}"
+    style="display:none; margin-top:15px;"
+>
+
+    <input
+        id="comment-input-${c.id}"
+        placeholder="Write comment..."
+        style="
+            width:100%;
+            padding:12px;
+            border-radius:10px;
+            border:none;
+            background:#1a1a1a;
+            color:white;
+        "
+    >
+
+    <button
+        onclick="addComment('${c.id}')"
+        style="margin-top:10px;"
+    >
+        Post Comment
+    </button>
+
+<div
+    id="comment-list-${c.id}"
+    style="margin-top:15px;"
+>
+
+${
+(c.comments || [])
+.map(comment => `
+    <div style="
+        margin-top:10px;
+        background:#111;
+        padding:10px;
+        border-radius:10px;
+    ">
+        <b>${comment.user}</b><br>
+        ${comment.text}
+    </div>
+`)
+.join("")
+}
+
+</div>
+
+</div>
+
+            
+
+        </div>
+
+        `;
+    });
+
+}
+
+loadComplaints();
+
+
+async function upvote(id, btn){
+
+    const response =
+    await fetch(
+        API + "/like/" + id,
+        {
+            method:"POST"
+        }
+    );
+
+    const data =
+    await response.json();
+
+    btn.querySelector(
+        "span"
+    ).innerText =
+    data.likes;
+}
+
+function toggleComments(id){
+
+    const box =
+        document.getElementById(
+            "comments-" + id
+        );
+
+    if(box.style.display === "none"){
+        box.style.display = "block";
+    }
+    else{
+        box.style.display = "none";
+    }
+}
+
+async function addComment(id){
+
+    const input =
+        document.getElementById(
+            "comment-input-" + id
+        );
+
+    if(input.value.trim() === "")
+        return;
+
+    const user =
+    JSON.parse(
+        localStorage.getItem("user")
+    );
+
+    const response =
+    await fetch(
+        API + "/comment/" + id,
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+            body:JSON.stringify({
+                user:user.name,
+                text:input.value
+            })
+        }
+    );
+
+    console.log(
+        response.status
+    );
+
+    console.log(
+        await response.text()
+    );
+
+    input.value = "";
+
+    loadComplaints();
+}
+
+function escalate(btn){
+
+    btn.innerHTML = "🚨 Escalated";
+
+    btn.style.background = "red";
+}
+function openUserProfile(name, email, photo){
+    localStorage.setItem(
+        "viewProfile",
+        JSON.stringify({
+            name,
+            email,
+            photo
+        })
+    );
+
+    window.location.href = "profile.html";
+}
+
+</script>
+
+</body>
+</html>
+
