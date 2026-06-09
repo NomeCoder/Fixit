@@ -1,8 +1,8 @@
+import platform
 import asyncio
 
-asyncio.set_event_loop_policy(
-    asyncio.WindowsProactorEventLoopPolicy()
-)
+if platform.system() == "Windows":
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 from threading import Thread
 
 from fastapi import FastAPI, UploadFile, File, Form
