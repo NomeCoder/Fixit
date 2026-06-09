@@ -53,9 +53,9 @@ def predict_issue(image_path):
     }
 app = FastAPI()
 cloudinary.config(
-    cloud_name=os.getenv("dlxcp4fyf"),
-    api_key=os.getenv("192131941273286"),
-    api_secret=os.getenv("3MR-D1VZq8Y_aV-CXTDcKzWwi7Q"),
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
     secure=True
 )
 MONGO_URI = "mongodb+srv://aryan:aryan5643@fixit.f1dekoj.mongodb.net/?appName=Fixit"
