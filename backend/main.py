@@ -19,7 +19,9 @@ import pickle
 import tensorflow as tf
 import numpy as np
 from email_sender import send_complaint_email
-
+import cloudinary
+import cloudinary.uploader
+import os
 
 model = tf.keras.models.load_model("fixit_model.keras")
 
@@ -50,6 +52,12 @@ def predict_issue(image_path):
         "department": DEPARTMENTS[CLASS_NAMES[idx]]
     }
 app = FastAPI()
+cloudinary.config(
+    cloud_name=os.getenv("dlxcp4fyf"),
+    api_key=os.getenv("192131941273286"),
+    api_secret=os.getenv("3MR-D1VZq8Y_aV-CXTDcKzWwi7Q"),
+    secure=True
+)
 MONGO_URI = "mongodb+srv://aryan:aryan5643@fixit.f1dekoj.mongodb.net/?appName=Fixit"
 
 client = MongoClient(MONGO_URI)
@@ -57,7 +65,7 @@ client = MongoClient(MONGO_URI)
 db = client["civic_feed"]
 
 complaints_collection = db["complaints"]
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -68,8 +76,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 complaints = []
 
@@ -257,18 +264,31 @@ async def report_issue(
 
     image: UploadFile | None = File(None)
 ):
+    
+    image_url = None
     image_path = None
-
+    import tempfile
     if image:
-        filename = f"{uuid.uuid4()}_{image.filename}"
-        filepath = os.path.join(UPLOAD_DIR, filename)
+        file_bytes = await image.read()
 
-        with open(filepath, "wb") as f:
-            f.write(await image.read())
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+            tmp.write(file_bytes)
+            image_path = tmp.name
 
-        image_path = filepath
+        upload_result = cloudinary.uploader.upload(
+            file_bytes,
+            folder="fixit"
+        )
 
-    result = predict_issue(image_path)
+        image_url = upload_result["secure_url"]
+
+    if image_path:
+        result = predict_issue(image_path)
+    else:
+        result = {
+            "issue": issue_type,
+            "department": "Municipal Corporation"
+        }
 
     authority = result["department"]
     predicted_issue = result["issue"]
@@ -317,7 +337,7 @@ async def report_issue(
 
     "location": location,
 
-    "image": f"https://fixit-msbc.onrender.com/{image_path}" if image_path else None,
+    "image": image_url,
 
     "authority": authority,
     "ai_prediction": predicted_issue,
@@ -330,6 +350,8 @@ async def report_issue(
     result = complaints_collection.insert_one(
         complaint
     )
+    if image_path and os.path.exists(image_path):
+    os.remove(image_path)
 
     complaint["_id"] = str(
         result.inserted_id
